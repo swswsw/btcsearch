@@ -23,6 +23,10 @@ var app = express();
 
 var addr = ""; // btc addr in parameter or in url
 
+var config = {
+	datadir: __dirname + "/data/",
+}
+
 app.set('port', (process.env.PORT || 3000))
 app.use(express.static(__dirname + '/public'))
 
@@ -36,17 +40,46 @@ app.get('/data/:addr', function(req, resp) {
 	// get address in url
 	addr = req.param("addr");
 	console.log("addr=" + addr);
-	resp.end();
+	readDir(config.datadir + addr, req, resp);
 });
 
 // show all the relevant info at the address.
-// url is /addr?addr=<addr>
-app.get('/addr', function(req, resp) {
+// url is /api/addr?addr=<addr>
+app.get('/api/addr', function(req, resp) {
 	addr = req.param("addr");
 	console.log("addr=" + addr);
-	resp.end();
+	readDir(config.datadir + addr, req, resp);
 });
 
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
+
+/**
+ * read dir and display all the folders.  
+ */
+function readDir(dirname, req, resp) {
+	var result;
+
+	// read dir using async
+	// after reading it, we should print 
+	fs.readdir(dirname, function(err, filenames) {
+		if (err) {
+			console.error(err);
+			result = {
+				success: "false",
+				errmsg: "address not found.",
+			};
+			resp.send(JSON.stringify(result));
+		} else {
+			resp.send(JSON.stringify(filenames));
+			// for (var i=0; i < filenames.length; i++) {
+			// 	var filename = filenames[i];
+			// }
+		}
+
+		resp.end();
+	});
+
+
+}
