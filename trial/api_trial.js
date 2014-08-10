@@ -56,10 +56,11 @@ app.listen(app.get('port'), function() {
 })
 
 /**
- * read dir and display all the folders.  
+ * read dir and display all the files.  
  */
 function readDir(dirname, req, resp) {
 	var result;
+	var convertedFilenames; // array of converted filenames
 
 	// read dir using async
 	// after reading it, we should print 
@@ -72,7 +73,9 @@ function readDir(dirname, req, resp) {
 			};
 			resp.send(JSON.stringify(result));
 		} else {
-			resp.send(JSON.stringify(filenames));
+			// convert filenames
+			convertedFilenames = convertFilenames(filenames);
+			resp.send(JSON.stringify(convertedFilenames));
 			// for (var i=0; i < filenames.length; i++) {
 			// 	var filename = filenames[i];
 			// }
@@ -82,4 +85,19 @@ function readDir(dirname, req, resp) {
 	});
 
 
+}
+
+/**
+ * replace \ with / in the filename.  
+ * because our system store url / as \. 
+ */
+function convertFilenames(filenames) {
+	var results = [];
+	var filename;
+	for (var i=0; i<filenames.length; i++) {
+		filename = filenames[i];
+		filename = filename.replace(/\\/g,"/");
+		results[i] = filename;
+	}
+	return results;
 }
