@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Search Result</title>
+
+<script src="js/jquery-2.1.1.min.js"></script>
+
+<script type="text/javascript">
+// namespace
+var btcsearch = btcsearch || {};
+
+// get url parameter.  get parameter from url.  
+btcsearch.gup = function( name ) {
+  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regexS = "[\\?&]"+name+"=([^&#]*)";
+  var regex = new RegExp( regexS );
+  var results = regex.exec( window.location.href );
+  if( results == null )
+    return null;
+  else
+    return results[1];
+}
+
+
+
+/**
+ * @param result - data item for each search result.  right now, result is just a string.  which is the url of the link.
+ */
+function displayOneResult(result) {
+	// this is the template for new element
+	var resultElem = $(".result-elem-template").clone();
+	// remove this class so that next time we grab this, we will only get one template.
+	resultElem.removeClass("result-elem-template"); 
+	var resultContainer = $(".result-container");
+	
+	// change the necessary data
+	resultElem.find(".result-title").find("a").text(result);
+	resultElem.find(".result-title").find("a").attr("href", result);
+	resultElem.find(".result-link").text(result);
+	resultElem.find(".result-link").attr("href", result);
+	// append to result-container
+	resultContainer.append(resultElem);
+	// make it visible
+	resultElem.removeClass("nodisplay");
+}
+
+$(document).ready(function() {
+	// get bitcoin addr from url parameter
+	var addr = btcsearch.gup("addr"); // return null if not exist
+	if (addr != null) {
+	
+		// call api to get data.
+		// display in the result.  
+		var apiUrl = "sample/addr?addr={addr}"; // for sample testing
+		//var apiUrl = "api/addr?addr={addr}"; // real one
+		apiUrl = apiUrl.replace("{addr}", encodeURI(addr));
+		$.getJSON(apiUrl, function(data) {
+			console.log(data);
+			
+			// check if data is array.  actually, skip that.  
+			for (var idxResult=0; idxResult < data.length; idxResult++) {
+				// display one result
+				displayOneResult(data[idxResult]);
+			}
+			
+		});
+		
+		// put the addr value in the query box
+		$("#txtAddr").val(addr);
+	} else {
+		// todo: give user error	
+	}
+});
+
+</script>
+</head>
+
+<style>
+body {
+	background-color: rgba(4, 17, 33, 1);
+	font-family: arial,sans-serif;
+}
+
+.top-bar {
+	margin: 10px;
+}
+
+.query-box {
+	font-size: 2em;
+	margin: 0px;
+	background-color: rgba(255,255,255,0.5);
+}
+
+.search-button {
+	margin: 0px;
+	position: relative;
+	top: 5px;
+}
+
+.search-button-img {
+	width: 35px;
+	height: 35px;
+}
+
+.result-container {
+}
+
+.result-elem {
+	background-color: blue;
+	border-radius: 5px;
+	padding: 10px;
+	margin: 10px;
+}
+
+.result-elem a {
+	color: white;
+}
+
+.bg-blue {
+	background-color: rgba(0,0,128,0.5);
+}
+
+.bg-red {
+	background-color: rgba(255,0,0,0.5);
+}
+
+.bg-green {
+	background-color: rgba(0,255,0,0.5);
+}
+
+.nodisplay {
+	display: none;
+}
+
+</style>
+
+<body>
+
+<div class="top-bar">
+	<form action="">
+        <input id="txtAddr" name="addr" type="text" class="query-box" size="40" placeholder="Bitcoin Address"/>
+        <button class="search-button"><img src="img/search2.png" class="search-button-img"/></button>
+    </form>
+</div>
+
+<div class="result-container">
+
+    <div class="result-elem result-elem-template bg-blue nodisplay">
+        <h3 class="result-title"><a href="http://phoronix.com/forums/member.php?25148-ChrisXY&tab=activitystream&type=user">View Profile: ChrisXY - Phoronix Forums</a></h3>
+        <a href="http://phoronix.com/forums/member.php?25148-ChrisXY&tab=activitystream&type=user" class="result-link">http://phoronix.com/forums/member.php?25148-ChrisXY&tab=activitystream&type=user</a>
+    </div>
+
+</div>
+
+
+</body>
+</html>
