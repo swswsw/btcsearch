@@ -52,8 +52,8 @@ $(document).ready(function() {
 	
 		// call api to get data.
 		// display in the result.  
-		var apiUrl = "sample/addr?addr={addr}"; // for sample testing
-		//var apiUrl = "api/addr?addr={addr}"; // real one
+		//var apiUrl = "sample/addr?addr={addr}"; // for sample testing
+		var apiUrl = "api/addr?addr={addr}"; // real one
 		apiUrl = apiUrl.replace("{addr}", encodeURI(addr));
 		$.getJSON(apiUrl, function(data) {
 			console.log(data);
